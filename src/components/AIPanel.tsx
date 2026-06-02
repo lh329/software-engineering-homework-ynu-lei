@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Sparkles, FileText, Briefcase, Lightbulb, Loader2 } from 'lucide-react';
 import { useResumeStore } from '@/store/resumeStore';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function AIPanel() {
   const { resumeData, updatePersonalInfo, isAIProcessing, setAIProcessing } = useResumeStore();
@@ -205,13 +207,19 @@ export default function AIPanel() {
           {aiResult && (
             <div className="space-y-2">
               <p className="text-sm font-medium text-gray-700">优化结果：</p>
-              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                {aiResult}
-              </p>
+              <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg prose prose-sm max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {aiResult}
+                </ReactMarkdown>
+              </div>
               {explanation && (
                 <div className="flex items-start gap-2 text-sm text-gray-500 bg-blue-50 p-3 rounded-lg">
                   <Lightbulb className="w-4 h-4 text-blue-500 mt-0.5" />
-                  <span>优化说明：{explanation}</span>
+                  <div className="prose prose-sm max-w-none">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {`优化说明：${explanation}`}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               )}
             </div>
