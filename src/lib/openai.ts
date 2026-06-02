@@ -1,7 +1,8 @@
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.DOUBAO_API_KEY || 'ark-6ac1e945-7979-4ada-8cde-0ae1bf99e095-74b63',
+  baseURL: process.env.DOUBAO_BASE_URL || 'https://ark.cn-beijing.volces.com/api/v3',
 });
 
 export async function optimizeResumeSection(
@@ -26,7 +27,7 @@ export async function optimizeResumeSection(
   `;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: process.env.DOUBAO_MODEL || 'doubao-seed-2-0-mini-260428',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.7,
   });
@@ -68,7 +69,7 @@ export async function analyzeJD(jdContent: string): Promise<{
   `;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: process.env.DOUBAO_MODEL || 'doubao-seed-2-0-mini-260428',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.3,
   });
@@ -117,7 +118,7 @@ export async function matchResumeWithJD(
   `;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: process.env.DOUBAO_MODEL || 'doubao-seed-2-0-mini-260428',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.5,
   });
@@ -163,7 +164,7 @@ export async function suggestCareerPath(
   `;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: process.env.DOUBAO_MODEL || 'doubao-seed-2-0-mini-260428',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.7,
   });
@@ -201,7 +202,7 @@ export async function generateSummary(
   `;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: process.env.DOUBAO_MODEL || 'doubao-seed-2-0-mini-260428',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.7,
   });
