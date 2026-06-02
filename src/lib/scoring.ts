@@ -55,7 +55,7 @@ export function calculateResumeScore(resume: ResumeData): ScoreResult[] {
   else if (totalExpYears >= 3) experienceScore += 20;
   else if (totalExpYears >= 1) experienceScore += 10;
 
-  const hasAchievements = resume.experience.some(exp => exp.achievements.length > 0);
+  const hasAchievements = resume.experience.some(exp => exp.achievements && exp.achievements.length > 0);
   if (hasAchievements) experienceScore += 40;
   else experienceSuggestions.push('建议为工作经历添加量化成就');
 
@@ -84,11 +84,11 @@ export function calculateResumeScore(resume: ResumeData): ScoreResult[] {
   if (resume.projects.length >= 3) projectScore += 30;
   else if (resume.projects.length >= 1) projectScore += 15;
 
-  const projectWithTech = resume.projects.filter(p => p.technologies.length >= 3);
+  const projectWithTech = resume.projects.filter(p => p.technologies && p.technologies.length >= 3);
   if (projectWithTech.length >= 2) projectScore += 30;
   else projectSuggestions.push('建议为项目添加详细技术栈');
 
-  const projectWithAchievements = resume.projects.filter(p => p.achievements.length > 0);
+  const projectWithAchievements = resume.projects.filter(p => p.achievements && p.achievements.length > 0);
   if (projectWithAchievements.length >= 1) projectScore += 40;
   else projectSuggestions.push('建议为项目添加量化成果');
 
