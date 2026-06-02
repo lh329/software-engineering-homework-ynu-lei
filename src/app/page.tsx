@@ -7,9 +7,11 @@ import ScorePanel from '@/components/ScorePanel';
 import ThemeSelector from '@/components/ThemeSelector';
 import AIPanel from '@/components/AIPanel';
 import ResumeActions from '@/components/ResumeActions';
+import WelcomePage from '@/components/WelcomePage';
 import { FileText, Sparkles, BarChart3, Palette } from 'lucide-react';
 
 export default function Home() {
+  const [showWelcome, setShowWelcome] = useState(true);
   const [activeRightPanel, setActiveRightPanel] = useState<'preview' | 'ai' | 'score' | 'theme'>('preview');
   const [showRightPanel, setShowRightPanel] = useState(true);
 
@@ -34,6 +36,11 @@ export default function Home() {
         return <ResumePreview />;
     }
   };
+
+  // 显示欢迎页面
+  if (showWelcome) {
+    return <WelcomePage onContinue={() => setShowWelcome(false)} />;
+  }
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">
