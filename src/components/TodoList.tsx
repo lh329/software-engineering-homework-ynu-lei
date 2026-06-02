@@ -1,289 +1,165 @@
 'use client';
-import { useState } from 'react';
-import { Plus, Filter, Search, Download, Upload, Trash2, SortAsc, SortDesc, ListFilter } from 'lucide-react';
-import TodoItem from './TodoItem';
-import TodoForm from './TodoForm';
-import { useTodoStore } from '../store/todoStore';
-import type { Todo } from '../types/todo';
-import { getCategories, importTodos } from '../utils/storage';
 
-const sortOptions = [
-  { value: 'createdAt', label: '创建时间' },
-  { value: 'updatedAt', label: '更新时间' },
-  { value: 'priority', label: '优先级' },
-  { value: 'title', label: '标题' },
-];
+import React, { useState, useEffect } from 'react';
+import { Todo } from '@/types/todo';
+import { useTodoStore } from '@/store/todoStore';
+import { TodoItem } from './TodoItem';
+import { TodoForm } from './TodoForm';
+import { PlusIcon } from '@heroicons/react/24/outline';
 
-const priorityOptions = [
-  { value: 'all', label: '全部' },
-  { value: 'high', label: '高' },
-  { value: 'medium', label: '中' },
-  { value: 'low', label: '低' },
-];
+export function TodoList() {
+  const { todos, getFilteredTodos, filters, setFilter, sortBy, setSortBy } =
+    useTodoStore();
+  const [showForm, setShowForm] = useState(false);
+  const [editingTodo, setEditingTodo] = useState<Todo | undefined>();
+  const [mounted, setMounted] = useState(false);
 
-const statusOptions = [
-  { value: 'all', label: '全部' },
-  { value: 'active', label: '待完成' },
-  { value: 'completed', label: '已完成' },
-];
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-export default function TodoList() {
-  const {
-    todos,
-    filters,
-    addTodo,
-    updateTodo,
-    deleteTodo,
-    toggleTodo,
-    setFilters,
-    clearCompleted,
-    getFilteredTodos,
-    importTodos: importStoreTodos,
-    exportTodos,
-  } = useTodoStore();
-
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  if (!mounted) {
+    return <div className="text-center py-8">Loading...</div>;
+  }
 
   const filteredTodos = getFilteredTodos();
-  const categories = getCategories(todos);
 
-  const activeCount = todos.filter((todo) => !todo.completed).length;
-  const completedCount = todos.filter((todo) => todo.completed).length;
-
-  const handleSubmit = (todoData: Omit<Todo, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (editingTodo) {
-      updateTodo(editingTodo.id, todoData);
-    } else {
-      addTodo(todoData);
-    }
-    setIsFormOpen(false);
-    setEditingTodo(null);
+  const handleOpenForm = () => {
+    setEditingTodo(undefined);
+    setShowForm(true);
   };
 
-  const handleEdit = (todo: Todo) => {
+  const handleEditTodo = (todo: Todo) => {
     setEditingTodo(todo);
-    setIsFormOpen(true);
+    setShowForm(true);
   };
 
-  const handleExport = () => {
-    const data = exportTodos();
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'todos.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const content = event.target?.result as string;
-          const imported = importTodos(content);
-          if (imported.length > 0) {
-            importStoreTodos(imported);
-          }
-        };
-        reader.readAsText(file);
-      }
-    };
-    input.click();
-  };
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters({ [key]: value });
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditingTodo(undefined);
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">任务管理</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {activeCount} 项待完成 | {completedCount} 项已完成
+          <h1 className="text-3xl font-bold text-gray-900">My Todos</h1>
+          <p className="text-gray-600 mt-1">
+            {todos.length} total • {filteredTodos.length} shown
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleImport}
-            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-            title="导入"
-          >
-            <Upload className="w-5 h-5" />
-          </button>
-          <button
-            onClick={handleExport}
-            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-            title="导出"
-          >
-            <Download className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setIsFormOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
-          >
-            <Plus className="w-4 h-4" />
-            添加任务
-          </button>
-        </div>
+        <button
+          onClick={handleOpenForm}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+        >
+          <PlusIcon className="w-5 h-5" />
+          Add Todo
+        </button>
       </div>
 
-      {/* Search and Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
+        <div>
+          <label className="text-sm font-medium text-gray-700 block mb-1">
+            Status
+          </label>
+          <select
+            value={filters.status}
+            onChange={(e) =>
+              setFilter({
+                status: e.target.value as 'all' | 'active' | 'completed',
+              })
+            }
+            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-gray-700 block mb-1">
+            Priority
+          </label>
+          <select
+            value={filters.priority}
+            onChange={(e) =>
+              setFilter({
+                priority: e.target.value as
+                  | 'all'
+                  | 'low'
+                  | 'medium'
+                  | 'high',
+              })
+            }
+            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-gray-700 block mb-1">
+            Sort By
+          </label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="date">Date</option>
+            <option value="priority">Priority</option>
+            <option value="title">Title</option>
+            <option value="dueDate">Due Date</option>
+          </select>
+        </div>
+
+        <div className="md:col-span-2 lg:col-span-2">
+          <label className="text-sm font-medium text-gray-700 block mb-1">
+            Search
+          </label>
           <input
             type="text"
-            value={filters.search}
-            onChange={(e) => handleFilterChange('search', e.target.value)}
-            placeholder="搜索任务..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+            placeholder="Search todos..."
+            value={filters.searchQuery}
+            onChange={(e) =>
+              setFilter({
+                searchQuery: e.target.value,
+              })
+            }
+            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
-        {/* Toggle Filters */}
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 mt-3 text-sm text-gray-500 hover:text-primary-600 transition-colors"
-        >
-          <Filter className="w-4 h-4" />
-          {showFilters ? '隐藏筛选' : '显示筛选'}
-        </button>
-
-        {/* Filters */}
-        {showFilters && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-gray-100">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">状态</label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
-              >
-                {statusOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">优先级</label>
-              <select
-                value={filters.priority}
-                onChange={(e) => handleFilterChange('priority', e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
-              >
-                {priorityOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">分类</label>
-              <select
-                value={filters.category}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
-              >
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category === 'all' ? '全部' : category}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">排序</label>
-              <div className="flex items-center gap-1">
-                <select
-                  value={filters.sortBy}
-                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={() =>
-                    setFilters({ sortOrder: filters.sortOrder === 'asc' ? 'desc' : 'asc' })
-                  }
-                  className="px-2 py-2 border border-gray-300 border-l-0 rounded-r-lg hover:bg-gray-50 transition-colors"
-                >
-                  {filters.sortOrder === 'asc' ? (
-                    <SortAsc className="w-4 h-4 text-gray-500" />
-                  ) : (
-                    <SortDesc className="w-4 h-4 text-gray-500" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Todo List */}
       <div className="space-y-3">
-        {filteredTodos.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-            <ListFilter className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">暂无任务</h3>
-            <p className="text-sm text-gray-400">点击上方按钮添加你的第一个任务</p>
-          </div>
-        ) : (
+        {filteredTodos.length > 0 ? (
           filteredTodos.map((todo) => (
             <TodoItem
               key={todo.id}
               todo={todo}
-              onToggle={toggleTodo}
-              onEdit={handleEdit}
-              onDelete={deleteTodo}
+              onEdit={handleEditTodo}
             />
           ))
+        ) : (
+          <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <p className="text-gray-500 text-lg">No todos found</p>
+            <p className="text-gray-400 text-sm mt-1">
+              {todos.length === 0
+                ? 'Create your first todo to get started'
+                : 'Try adjusting your filters'}
+            </p>
+          </div>
         )}
       </div>
 
-      {/* Clear Completed */}
-      {completedCount > 0 && (
-        <div className="mt-6 text-center">
-          <button
-            onClick={clearCompleted}
-            className="inline-flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors text-sm"
-          >
-            <Trash2 className="w-4 h-4" />
-            清除已完成 ({completedCount})
-          </button>
-        </div>
-      )}
-
-      {/* Form Modal */}
-      {isFormOpen && (
+      {showForm && (
         <TodoForm
           todo={editingTodo}
-          onSubmit={handleSubmit}
-          onClose={() => {
-            setIsFormOpen(false);
-            setEditingTodo(null);
-          }}
+          onClose={handleCloseForm}
         />
       )}
     </div>
