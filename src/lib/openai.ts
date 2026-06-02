@@ -22,7 +22,11 @@ export async function optimizeResumeSection(
     4. 适当使用行业关键词
     5. 语言流畅自然，适合简历使用
     
-    请直接返回优化后的内容，不要包含任何额外说明或解释。
+    输出格式要求：
+    - 只返回优化后的纯文本内容
+    - 不要包含任何额外说明、解释、标记或标题
+    - 不要使用markdown格式
+    - 直接输出优化后的文字即可
   `;
 
   const response = await openai.chat.completions.create({
@@ -35,14 +39,21 @@ export async function optimizeResumeSection(
   
   // 清理可能的格式标记
   const cleanedResult = result
-    .replace(/^优化后的内容：\s*/, '')
-    .replace(/^优化内容：\s*/, '')
-    .replace(/^\s*-\s*/, '')
+    .replace(/^优化后的内容[：:]?\s*/, '')
+    .replace(/^优化内容[：:]?\s*/, '')
+    .replace(/^优化结果[：:]?\s*/, '')
+    .replace(/^输出[：:]?\s*/, '')
+    .replace(/^回答[：:]?\s*/, '')
+    .replace(/^\s*[-*·]\s*/, '')
+    .replace(/^\s*[\d]+\.\s*/, '')
+    .replace(/^```[\s\S]*?```\s*/, '')
+    .replace(/^```\s*/, '')
+    .replace(/```\s*$/, '')
     .trim();
   
   return {
     optimized: cleanedResult || content, // 如果返回为空，返回原内容
-    explanation: '内容已优化',
+    explanation: '', // 不返回优化说明
   };
 }
 

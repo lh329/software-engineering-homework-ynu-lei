@@ -132,7 +132,7 @@ export default function ResumePreview() {
                     {exp.description && (
                       <p className="text-sm mt-1 leading-relaxed">{exp.description}</p>
                     )}
-                    {exp.achievements.length > 0 && (
+                    {exp.achievements && exp.achievements.length > 0 && (
                       <ul className="mt-2 space-y-1">
                         {exp.achievements.map((achievement, index) => (
                           <li key={index} className="text-sm flex items-start gap-2">
@@ -171,7 +171,7 @@ export default function ResumePreview() {
                     {project.description && (
                       <p className="text-sm mt-1 leading-relaxed">{project.description}</p>
                     )}
-                    {project.technologies.length > 0 && (
+                    {project.technologies && project.technologies.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {project.technologies.map((tech) => (
                           <span
@@ -187,7 +187,7 @@ export default function ResumePreview() {
                         ))}
                       </div>
                     )}
-                    {project.achievements.length > 0 && (
+                    {project.achievements && project.achievements.length > 0 && (
                       <ul className="mt-2 space-y-1">
                         {project.achievements.map((achievement, index) => (
                           <li key={index} className="text-sm flex items-start gap-2">

@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { Todo } from '@/types/todo';
 import { useTodoStore } from '@/store/todoStore';
-import { TodoItem } from './TodoItem';
-import { TodoForm } from './TodoForm';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import TodoItem from './TodoItem';
+import TodoForm from './TodoForm';
+import { Plus } from 'lucide-react';
 
 export function TodoList() {
-  const { todos, getFilteredTodos, filters, setFilter, sortBy, setSortBy } =
+  const { todos, getFilteredTodos, filters, setFilters, toggleTodo, deleteTodo, addTodo, updateTodo } =
     useTodoStore();
   const [showForm, setShowForm] = useState(false);
   const [editingTodo, setEditingTodo] = useState<Todo | undefined>();
@@ -39,6 +39,15 @@ export function TodoList() {
     setEditingTodo(undefined);
   };
 
+  const handleSubmitTodo = (data: Omit<Todo, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (editingTodo) {
+      updateTodo(editingTodo.id, data);
+    } else {
+      addTodo(data);
+    }
+    handleCloseForm();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -52,7 +61,7 @@ export function TodoList() {
           onClick={handleOpenForm}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
         >
-          <PlusIcon className="w-5 h-5" />
+          <Plus className="w-5 h-5" />
           Add Todo
         </button>
       </div>
@@ -65,7 +74,7 @@ export function TodoList() {
           <select
             value={filters.status}
             onChange={(e) =>
-              setFilter({
+              setFilters({
                 status: e.target.value as 'all' | 'active' | 'completed',
               })
             }
@@ -84,7 +93,7 @@ export function TodoList() {
           <select
             value={filters.priority}
             onChange={(e) =>
-              setFilter({
+              setFilters({
                 priority: e.target.value as
                   | 'all'
                   | 'low'
@@ -106,14 +115,14 @@ export function TodoList() {
             Sort By
           </label>
           <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            value={filters.sortBy}
+            onChange={(e) => setFilters({ sortBy: e.target.value as any })}
             className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="date">Date</option>
+            <option value="createdAt">Date</option>
             <option value="priority">Priority</option>
             <option value="title">Title</option>
-            <option value="dueDate">Due Date</option>
+            <option value="updatedAt">Updated</option>
           </select>
         </div>
 
@@ -124,10 +133,10 @@ export function TodoList() {
           <input
             type="text"
             placeholder="Search todos..."
-            value={filters.searchQuery}
+            value={filters.search}
             onChange={(e) =>
-              setFilter({
-                searchQuery: e.target.value,
+              setFilters({
+                search: e.target.value,
               })
             }
             className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -141,7 +150,9 @@ export function TodoList() {
             <TodoItem
               key={todo.id}
               todo={todo}
+              onToggle={toggleTodo}
               onEdit={handleEditTodo}
+              onDelete={deleteTodo}
             />
           ))
         ) : (
@@ -158,7 +169,8 @@ export function TodoList() {
 
       {showForm && (
         <TodoForm
-          todo={editingTodo}
+          todo={editingTodo || null}
+          onSubmit={handleSubmitTodo}
           onClose={handleCloseForm}
         />
       )}
