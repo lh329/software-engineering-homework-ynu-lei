@@ -1,14 +1,31 @@
 'use client';
 
-import { User, Mail, Phone, MapPin, Globe, Linkedin, Github } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe, Linkedin, Github, Upload, X } from 'lucide-react';
 import { useResumeStore } from '@/store/resumeStore';
+import { useState } from 'react';
 
 export default function PersonalInfoEditor() {
   const { resumeData, updatePersonalInfo } = useResumeStore();
   const { personalInfo } = resumeData;
+  const [showAvatar, setShowAvatar] = useState(true);
 
   const handleChange = (field: keyof typeof personalInfo, value: string) => {
     updatePersonalInfo({ [field]: value });
+  };
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        updatePersonalInfo({ avatar: event.target?.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeAvatar = () => {
+    updatePersonalInfo({ avatar: '' });
   };
 
   return (
@@ -17,6 +34,57 @@ export default function PersonalInfoEditor() {
         <User className="w-5 h-5 text-primary-500" />
         基本信息
       </h3>
+
+      {/* 头像上传 */}
+      <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="flex-1">
+          <label className="flex items-center gap-2 mb-2">
+            <input
+              type="checkbox"
+              checked={showAvatar}
+              onChange={(e) => {
+                setShowAvatar(e.target.checked);
+                if (!e.target.checked) {
+                  updatePersonalInfo({ avatar: '' });
+                }
+              }}
+              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span className="text-sm font-medium text-gray-700">显示头像</span>
+          </label>
+          
+          {showAvatar && (
+            <div className="space-y-2">
+              {personalInfo.avatar ? (
+                <div className="relative inline-block">
+                  <img
+                    src={personalInfo.avatar}
+                    alt="头像"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                  />
+                  <button
+                    onClick={removeAvatar}
+                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-20 h-20 border-2 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors">
+                  <Upload className="w-6 h-6 text-gray-400" />
+                  <span className="text-xs text-gray-500 mt-1">上传</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>

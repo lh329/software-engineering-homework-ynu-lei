@@ -36,7 +36,7 @@ export default function ResumePreview() {
   }, {} as Record<string, typeof skills>);
 
   return (
-    <div className="resume-preview" style={{ fontFamily: themeConfig.fontFamily }}>
+    <div className="resume-preview w-full" style={{ fontFamily: themeConfig.fontFamily }}>
       <style>{`
         .resume-preview {
           --primary-color: ${themeConfig.primaryColor};
@@ -48,13 +48,23 @@ export default function ResumePreview() {
       {/* Header */}
       <header className="resume-header">
         <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: themeConfig.primaryColor }}>
-              {personalInfo.name}
-            </h1>
-            <h2 className="text-lg" style={{ color: themeConfig.secondaryColor }}>
-              {personalInfo.title}
-            </h2>
+          <div className="flex items-start gap-4">
+            {personalInfo.avatar && (
+              <img
+                src={personalInfo.avatar}
+                alt="头像"
+                className="w-20 h-20 rounded-full object-cover border-2"
+                style={{ borderColor: themeConfig.primaryColor }}
+              />
+            )}
+            <div>
+              <h1 className="text-2xl font-bold" style={{ color: themeConfig.primaryColor }}>
+                {personalInfo.name}
+              </h1>
+              <h2 className="text-lg" style={{ color: themeConfig.secondaryColor }}>
+                {personalInfo.title}
+              </h2>
+            </div>
           </div>
           <div className="text-right text-sm" style={{ color: themeConfig.secondaryColor }}>
             {personalInfo.email && (
