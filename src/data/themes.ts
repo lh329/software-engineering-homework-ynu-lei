@@ -1,0 +1,136 @@
+import type { ThemeConfig, ResumeData } from '../types/resume';
+
+export const themes: Record<string, ThemeConfig> = {
+  modern: {
+    id: 'modern',
+    name: '现代简约',
+    primaryColor: '#2563eb',
+    secondaryColor: '#64748b',
+    accentColor: '#f59e0b',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    layout: 'single-column',
+  },
+  classic: {
+    id: 'classic',
+    name: '经典商务',
+    primaryColor: '#1e293b',
+    secondaryColor: '#475569',
+    accentColor: '#3b82f6',
+    fontFamily: 'Georgia, serif',
+    layout: 'two-column',
+  },
+  professional: {
+    id: 'professional',
+    name: '专业精英',
+    primaryColor: '#0f172a',
+    secondaryColor: '#64748b',
+    accentColor: '#10b981',
+    fontFamily: 'Roboto, sans-serif',
+    layout: 'two-column',
+  },
+  creative: {
+    id: 'creative',
+    name: '创意设计',
+    primaryColor: '#8b5cf6',
+    secondaryColor: '#ec4899',
+    accentColor: '#06b6d4',
+    fontFamily: 'Poppins, sans-serif',
+    layout: 'single-column',
+  },
+};
+
+export const defaultResumeData: ResumeData = {
+  personalInfo: {
+    name: '张三',
+    title: '高级前端工程师',
+    email: 'zhangsan@example.com',
+    phone: '138-0000-0000',
+    location: '北京市朝阳区',
+    avatar: '',
+    summary: '拥有5年以上前端开发经验，精通Vue、React等主流框架，具备优秀的团队协作能力和项目管理经验。热爱技术，追求卓越，善于学习新技术并应用到实际项目中。',
+    portfolio: 'https://portfolio.example.com',
+    linkedin: 'https://linkedin.com/in/zhangsan',
+    github: 'https://github.com/zhangsan',
+  },
+  education: [
+    {
+      id: '1',
+      school: '北京大学',
+      degree: 'bachelor' as const,
+      major: '计算机科学与技术',
+      startDate: '2015-09',
+      endDate: '2019-06',
+      gpa: '3.8/4.0',
+      description: '主修课程：数据结构、算法设计、操作系统、计算机网络、数据库原理',
+    },
+  ],
+  experience: [
+    {
+      id: '1',
+      company: '字节跳动',
+      position: '前端工程师',
+      startDate: '2021-03',
+      endDate: '至今',
+      description: '负责抖音Web端核心功能开发，参与性能优化和架构升级',
+      achievements: [
+        '主导前端性能优化项目，首屏加载时间减少40%',
+        '设计并实现企业级组件库，覆盖50+组件',
+      ],
+    },
+    {
+      id: '2',
+      company: '阿里巴巴',
+      position: '前端开发工程师',
+      startDate: '2019-07',
+      endDate: '2021-02',
+      description: '参与淘宝首页和商品详情页的开发与维护',
+      achievements: [
+        '负责核心业务模块开发，代码质量评分持续领先',
+        '推动团队技术分享，提升整体技术水平',
+      ],
+    },
+  ],
+  projects: [
+    {
+      id: '1',
+      name: '企业级组件库',
+      role: '技术负责人',
+      startDate: '2022-01',
+      endDate: '2022-12',
+      description: '从零搭建企业级UI组件库，支持主题定制和按需加载',
+      technologies: ['Vue3', 'TypeScript', 'Vite', 'TailwindCSS'],
+      achievements: ['支持10+主题配置', '文档覆盖率100%'],
+      url: 'https://github.com/zhangsan/ui-library',
+    },
+  ],
+  skills: [
+    { id: '1', name: 'Vue.js', category: '前端框架', level: 'expert' as const },
+    { id: '2', name: 'React', category: '前端框架', level: 'advanced' as const },
+    { id: '3', name: 'TypeScript', category: '编程语言', level: 'expert' as const },
+    { id: '4', name: 'Node.js', category: '后端', level: 'advanced' as const },
+    { id: '5', name: 'Webpack/Vite', category: '构建工具', level: 'advanced' as const },
+    { id: '6', name: 'CSS/Sass', category: '样式', level: 'expert' as const },
+  ],
+  awards: [
+    {
+      id: '1',
+      name: '优秀员工奖',
+      issuer: '字节跳动',
+      date: '2022-12',
+      description: '年度优秀员工，表彰在技术创新和团队贡献方面的突出表现',
+    },
+  ],
+  certifications: [
+    {
+      id: '1',
+      name: 'AWS Solutions Architect',
+      issuer: 'Amazon Web Services',
+      date: '2023-06',
+      credential: 'SAA-C03',
+    },
+  ],
+  languages: [
+    { id: '1', name: '中文', proficiency: 'native' as const },
+    { id: '2', name: 'English', proficiency: 'fluent' as const },
+  ],
+};
