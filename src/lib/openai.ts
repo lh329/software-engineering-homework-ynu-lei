@@ -10,20 +10,19 @@ export async function optimizeResumeSection(
   section: string
 ): Promise<{ optimized: string; explanation: string }> {
   const prompt = `
-    请优化以下简历${section}内容，使其更专业、更具吸引力：
+    请优化以下简历${section}内容，使其更专业、更具吸引力。
     
     原始内容：
     ${content}
     
-    要求：
+    优化要求：
     1. 使用专业术语，突出量化成果
     2. 使用主动语态和动词开头
     3. 保持原意，不添加虚假信息
     4. 适当使用行业关键词
+    5. 语言流畅自然，适合简历使用
     
-    请返回：
-    - 优化后的内容
-    - 优化说明（简要说明优化点）
+    请直接返回优化后的内容，不要包含任何额外说明或解释。
   `;
 
   const response = await openai.chat.completions.create({
@@ -33,11 +32,17 @@ export async function optimizeResumeSection(
   });
 
   const result = response.choices[0].message.content || '';
-  const parts = result.split('优化说明：');
+  
+  // 清理可能的格式标记
+  const cleanedResult = result
+    .replace(/^优化后的内容：\s*/, '')
+    .replace(/^优化内容：\s*/, '')
+    .replace(/^\s*-\s*/, '')
+    .trim();
   
   return {
-    optimized: parts[0].replace('优化后的内容：', '').trim(),
-    explanation: parts[1]?.trim() || '优化已完成',
+    optimized: cleanedResult || content, // 如果返回为空，返回原内容
+    explanation: '内容已优化',
   };
 }
 
