@@ -51,7 +51,7 @@ export default function AIPanel() {
         return;
       }
 
-      const response = await fetch('/api/optimize', {
+      const response = await fetch('http://localhost:8000/api/optimize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, section: optimizeSection }),
@@ -65,7 +65,7 @@ export default function AIPanel() {
           updatePersonalInfo({ summary: data.optimized });
         }
       } else {
-        alert(data.error);
+        alert(data.explanation || '优化失败');
       }
     } catch (error) {
       console.error('AI优化失败:', error);
@@ -83,19 +83,25 @@ export default function AIPanel() {
 
     setAIProcessing(true);
     try {
-      const response = await fetch('/api/jd/analyze', {
+      const response = await fetch('http://localhost:8000/api/jd/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jdContent, resumeData }),
+        body: JSON.stringify({ jd_text: jdContent }),
       });
 
       const data = await response.json();
       if (data.success) {
+        // 解析文本格式的结果
+        const result = data.result;
+        const titleMatch = result.match(/【职位名称】[：:](.*?)(?=【|$)/s);
+        const companyMatch = result.match(/【公司行业】[：:](.*?)(?=【|$)/s);
+        const skillsMatch = result.match(/【必备技能】[：:](.*?)(?=【|$)/s);
+        
         setJdAnalysis({
-          title: data.analysis.title || '',
-          company: data.analysis.company || '',
-          requiredSkills: data.analysis.requiredSkills || [],
-          matchScore: data.match?.matchScore || 0,
+          title: titleMatch ? titleMatch[1].trim() : '',
+          company: companyMatch ? companyMatch[1].trim() : '',
+          requiredSkills: skillsMatch ? skillsMatch[1].split(/[\n\-·*]/).map(s => s.trim()).filter(s => s) : [],
+          matchScore: 0,
         });
       }
     } catch (error) {
@@ -117,18 +123,24 @@ export default function AIPanel() {
 
     setAIProcessing(true);
     try {
-      const response = await fetch('/api/career', {
+      const resume_text = `工作经验：${experience}\n技能：${skills}`;
+      const response = await fetch('http://localhost:8000/api/career', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ experience, skills }),
+        body: JSON.stringify({ resume_text }),
       });
 
       const data = await response.json();
       if (data.success) {
+        const result = data.result;
+        const currentLevelMatch = result.match(/【当前水平评估】[：:](.*?)(?=【|$)/s);
+        const nextLevelMatch = result.match(/【短期目标.*?】[：:](.*?)(?=【|$)/s);
+        const skillsMatch = result.match(/【推荐学习技能】[：:](.*?)(?=【|$)/s);
+        
         setCareerSuggestion({
-          currentLevel: data.currentLevel || '',
-          nextLevel: data.nextLevel || '',
-          recommendedSkills: data.recommendedSkills || [],
+          currentLevel: currentLevelMatch ? currentLevelMatch[1].trim() : '',
+          nextLevel: nextLevelMatch ? nextLevelMatch[1].trim() : '',
+          recommendedSkills: skillsMatch ? skillsMatch[1].split(/[\n\-·*,，]/).map(s => s.trim()).filter(s => s) : [],
         });
       }
     } catch (error) {
