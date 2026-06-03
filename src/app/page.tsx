@@ -23,7 +23,8 @@ export default function Home() {
       if (!isDragging || !containerRef.current) return;
       
       const containerRect = containerRef.current.getBoundingClientRect();
-      const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      // 计算从右边到鼠标位置的距离（这样鼠标往左拖，右侧面板变大）
+      const newWidth = ((containerRect.right - e.clientX) / containerRect.width) * 100;
       
       // 限制宽度范围在30%到70%之间
       const clampedWidth = Math.min(Math.max(newWidth, 30), 70);
