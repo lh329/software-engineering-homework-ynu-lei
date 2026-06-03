@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import EditorLayout from '@/components/Editor/EditorLayout';
 import ResumePreview from '@/components/Resume/ResumePreview';
 import ScorePanel from '@/components/ScorePanel';
@@ -8,12 +8,42 @@ import ThemeSelector from '@/components/ThemeSelector';
 import AIPanel from '@/components/AIPanel';
 import ResumeActions from '@/components/ResumeActions';
 import WelcomePage from '@/components/WelcomePage';
-import { FileText, Sparkles, BarChart3, Palette } from 'lucide-react';
+import { FileText, Sparkles, BarChart3, Palette, GripVertical } from 'lucide-react';
 
 export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
   const [activeRightPanel, setActiveRightPanel] = useState<'preview' | 'ai' | 'score' | 'theme'>('preview');
   const [showRightPanel, setShowRightPanel] = useState(true);
+  const [rightPanelWidth, setRightPanelWidth] = useState(50); // 百分比
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !containerRef.current) return;
+      
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      
+      // 限制宽度范围在30%到70%之间
+      const clampedWidth = Math.min(Math.max(newWidth, 30), 70);
+      setRightPanelWidth(clampedWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
 
   const rightPanelTabs = [
     { id: 'preview', label: '预览', icon: FileText },
@@ -59,10 +89,19 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div ref={containerRef} className="flex-1 flex overflow-hidden">
         {/* Left Panel - Editor */}
-        <div className="flex-1 overflow-hidden">
+        <div className="overflow-hidden" style={{ width: `${100 - rightPanelWidth}%` }}>
           <EditorLayout />
+        </div>
+
+        {/* Resizer */}
+        <div
+          className={`hidden lg:flex w-1 cursor-col-resize bg-gray-300 hover:bg-gray-400 transition-colors items-center justify-center ${isDragging ? 'bg-primary-500' : ''}`}
+          onMouseDown={() => setIsDragging(true)}
+          title="拖拽调整宽度"
+        >
+          <GripVertical className="w-3 h-3 text-gray-500" />
         </div>
 
         {/* Right Panel Toggle (Mobile) */}
@@ -75,7 +114,8 @@ export default function Home() {
 
         {/* Right Panel */}
         <aside
-          className={`${showRightPanel ? 'translate-x-0' : 'translate-x-full'} lg:translate-x-0 fixed lg:relative right-0 top-14 lg:top-auto bottom-0 w-full lg:w-96 bg-white border-l border-gray-200 flex flex-col transition-transform duration-300 z-40`}
+          className={`${showRightPanel ? 'translate-x-0' : 'translate-x-full'} lg:translate-x-0 fixed lg:relative right-0 top-14 lg:top-auto bottom-0 w-full lg:bg-white border-l border-gray-200 flex flex-col transition-transform duration-300 z-40`}
+          style={{ width: `${rightPanelWidth}%` }}
         >
           {/* Tabs */}
           <div className="flex border-b border-gray-200">

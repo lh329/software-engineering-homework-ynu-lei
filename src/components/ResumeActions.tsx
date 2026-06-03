@@ -65,7 +65,7 @@ export default function ResumeActions() {
       const finalHeight = imgHeight * ratio;
 
       const imgX = (pdfWidth - finalWidth) / 2;
-      const imgY = (pdfHeight - finalHeight) / 2;
+      const imgY = 10; // 顶部对齐，留出10mm边距
 
       pdf.addImage(imgData, 'PNG', imgX, imgY, finalWidth, finalHeight);
       pdf.save(`${resumeData.personalInfo.name || 'resume'}_${Date.now()}.pdf`);
