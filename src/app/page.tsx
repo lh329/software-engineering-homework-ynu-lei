@@ -96,8 +96,8 @@ export default function Home() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="min-h-full">
+          <div className="flex-1 overflow-y-auto p-4 items-start justify-start">
+            <div className="w-full">
               {renderRightPanel()}
             </div>
           </div>

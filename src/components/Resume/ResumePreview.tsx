@@ -36,12 +36,14 @@ export default function ResumePreview() {
   }, {} as Record<string, typeof skills>);
 
   return (
-    <div className="resume-preview w-full" style={{ fontFamily: themeConfig.fontFamily }}>
+    <div className="resume-preview w-full flex flex-col items-start" style={{ fontFamily: themeConfig.fontFamily }}>
       <style>{`
         .resume-preview {
           --primary-color: ${themeConfig.primaryColor};
           --secondary-color: ${themeConfig.secondaryColor};
           --accent-color: ${themeConfig.accentColor};
+          align-self: flex-start;
+          justify-self: flex-start;
         }
       `}</style>
 
