@@ -215,9 +215,11 @@ export default function AIPanel() {
                   <Lightbulb className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
                     <p className="font-medium text-blue-700 mb-1">优化说明：</p>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} className="prose prose-sm max-w-none">
-                      {explanation}
-                    </ReactMarkdown>
+                    <div className="prose prose-sm max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {explanation}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               )}
