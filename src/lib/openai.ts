@@ -23,10 +23,17 @@ export async function optimizeResumeSection(
     5. 语言流畅自然，适合简历使用
     
     输出格式要求：
-    - 只返回优化后的纯文本内容
-    - 不要包含任何额外说明、解释、标记或标题
-    - 不要使用markdown格式
-    - 直接输出优化后的文字即可
+    请严格按照以下格式输出（注意不要添加其他内容）：
+    
+    【优化后的内容】
+    （这里写优化后的纯文本内容，不要使用markdown格式）
+    
+    【优化说明】
+    （这里详细说明优化的理由，包括：
+    1. 哪些地方进行了修改
+    2. 为什么要这样修改
+    3. 修改后带来的改进效果
+    4. 具体的优化建议）
   `;
 
   const response = await openai.chat.completions.create({
@@ -37,23 +44,40 @@ export async function optimizeResumeSection(
 
   const result = response.choices[0].message.content || '';
   
-  // 清理可能的格式标记
-  const cleanedResult = result
-    .replace(/^优化后的内容[：:]?\s*/, '')
-    .replace(/^优化内容[：:]?\s*/, '')
-    .replace(/^优化结果[：:]?\s*/, '')
-    .replace(/^输出[：:]?\s*/, '')
-    .replace(/^回答[：:]?\s*/, '')
-    .replace(/^\s*[-*·]\s*/, '')
-    .replace(/^\s*[\d]+\.\s*/, '')
-    .replace(/^```[\s\S]*?```\s*/, '')
-    .replace(/^```\s*/, '')
-    .replace(/```\s*$/, '')
-    .trim();
+  // 解析返回的内容
+  let optimized = content;
+  let explanation = '';
+  
+  const optimizedMatch = result.match(/【优化后的内容】([\s\S]*?)【优化说明】/);
+  const explanationMatch = result.match(/【优化说明】([\s\S]*)/);
+  
+  if (optimizedMatch && optimizedMatch[1]) {
+    optimized = optimizedMatch[1].trim();
+  } else {
+    // 如果没有找到标记，尝试清理格式标记
+    optimized = result
+      .replace(/^优化后的内容[：:]?\s*/, '')
+      .replace(/^优化内容[：:]?\s*/, '')
+      .replace(/^优化结果[：:]?\s*/, '')
+      .replace(/^输出[：:]?\s*/, '')
+      .replace(/^回答[：:]?\s*/, '')
+      .replace(/^\s*[-*·]\s*/, '')
+      .replace(/^\s*[\d]+\.\s*/, '')
+      .replace(/^```[\s\S]*?```\s*/, '')
+      .replace(/^```\s*/, '')
+      .replace(/```\s*$/, '')
+      .trim();
+  }
+  
+  if (explanationMatch && explanationMatch[1]) {
+    explanation = explanationMatch[1].trim();
+  } else {
+    explanation = '内容已优化，使用了更专业的表达方式';
+  }
   
   return {
-    optimized: cleanedResult || content, // 如果返回为空，返回原内容
-    explanation: '', // 不返回优化说明
+    optimized: optimized || content,
+    explanation: explanation,
   };
 }
 
