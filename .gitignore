@@ -35,6 +35,10 @@ Thumbs.db
 # TypeScript cache
 *.tsbuildinfo
 
+# Python cache
+__pycache__/
+*.py[cod]
+
 # Package manager lock files
 package-lock.json
 yarn.lock
